@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Home, Package, ChevronLeft, ChevronRight, LogOut, Store, BadgeCheck, Map, Bell, Users } from "lucide-react";
+import { Home, Package, ChevronLeft, ChevronRight, LogOut, Store, BadgeCheck, Map, Bell, Users, Newspaper } from "lucide-react";
 import cannabislogo from "../assets/weedlogo.svg";
 import { useAuth } from "../context/AuthContext";
 import ConfirmationModal from "./ConfirmationModal";
@@ -73,8 +73,8 @@ const Sidebar = () => {
           </Link>
         </li>
         <li>
-          <Link to="/map" className={`${isExpanded ? "pl-2" : "justify-center"} flex items-center gap-3 text-sm p-2 rounded-lg hover:bg-green-900 transition-all duration-200 hover:pl-5`}>
-            <Map size={18} /> {isExpanded && "Map"}
+          <Link to="/terms-of-use" className={`${isExpanded ? "pl-2" : "justify-center"} flex items-center gap-3 text-sm p-2 rounded-lg hover:bg-green-900 transition-all duration-200 hover:pl-5`}>
+            <Newspaper size={18} /> {isExpanded && "Terms of use"}
           </Link>
         </li>
         {/* notification div here with expanded ? : */}

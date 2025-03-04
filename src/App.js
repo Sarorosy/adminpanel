@@ -11,6 +11,7 @@ import './style.css';
 import StoreProfile from "./pages/StoreProfile";
 import VendorsMap from "./pages/VendorsMap";
 import VendorsPage from "./pages/VendorsPage";
+import TermsOfUse from "./pages/TermsOfUse";
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -45,6 +46,7 @@ const App = () => {
             <Route path="profile" element={<StoreProfile />} />
             <Route path="vendors" element={<VendorsPage />} />
             <Route path="map" element={<VendorsMap />} />
+            <Route path="terms-of-use" element={<TermsOfUse />} />
           </Route>
 
           {/* Fallback Route */}
