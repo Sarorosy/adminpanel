@@ -77,6 +77,11 @@ const Sidebar = () => {
             <Newspaper size={18} /> {isExpanded && "Terms of use"}
           </Link>
         </li>
+        <li>
+          <Link to="/privacy-policy" className={`${isExpanded ? "pl-2" : "justify-center"} flex items-center gap-3 text-sm p-2 rounded-lg hover:bg-green-900 transition-all duration-200 hover:pl-5`}>
+            <Newspaper size={18} /> {isExpanded && "Privacy Policy"}
+          </Link>
+        </li>
         {/* notification div here with expanded ? : */}
         <li className="relative bg-gray-200 text-gray-900 p-2 rounded-lg hover:bg-gray-300 transition-all duration-200 mx-1">
           <div onClick={() => setNotificationDivOpen(!notificationsDivOpen)} className={`${isExpanded ? "justify-between" : " justify-center"} relative cursor-pointer flex items-center `}>
