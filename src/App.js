@@ -13,6 +13,7 @@ import VendorsMap from "./pages/VendorsMap";
 import VendorsPage from "./pages/VendorsPage";
 import TermsOfUse from "./pages/TermsOfUse";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import StrainsPage from "./pages/StrainsPage";
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -46,6 +47,7 @@ const App = () => {
             <Route path="orders" element={<Orders />} />
             <Route path="profile" element={<StoreProfile />} />
             <Route path="vendors" element={<VendorsPage />} />
+            <Route path="strains" element={<StrainsPage />} />
             <Route path="map" element={<VendorsMap />} />
             <Route path="terms-of-use" element={<TermsOfUse />} />
             <Route path="privacy-policy" element={<PrivacyPolicy />} />
