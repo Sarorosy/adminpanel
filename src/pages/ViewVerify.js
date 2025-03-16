@@ -107,6 +107,12 @@ const ViewVerify = ( { vendorId, onClose, finalFunction }) => {
                   <span className="text-sm text-gray-500">Location</span>
                   <span className="text-base font-medium text-gray-900">{vendorDetails.location}</span>
                 </div>
+                {vendorDetails.website && (
+                  <div className="flex flex-col">
+                  <span className="text-sm text-gray-500">Website</span>
+                  <a href={vendorDetails.website} target="_blank" className="cursor-pointer text-base font-medium text-gray-900">{vendorDetails.website}</a>
+                </div>
+                )}
               </div>
             </div>
 
