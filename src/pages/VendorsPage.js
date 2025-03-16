@@ -16,6 +16,7 @@ import ViewVerify from "./ViewVerify";
 import StoreProfileForUser from "./StoreProfileForUser";
 import * as XLSX from "xlsx";
 import ImportVendors from "./ImportVendors";
+import topsellericon from '../assets/topseller.svg';
 
 const VendorsPage = () => {
   const [vendors, setVendors] = useState([]);
@@ -36,57 +37,57 @@ const VendorsPage = () => {
   const fetchVendors = async () => {
     setLoading(true);
     try {
-        const response = await fetch("https://ryupunch.com/leafly/api/Admin/list_vendors", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${user.token}`,
-            },
-        });
-
-        const result = await response.json();
-
-        if (result.status) {
-            setVendors(result.data);
-            setApprovedVendors(result.data.filter((vendor) => vendor.is_verified == 1));
-            setPendingVendors(result.data.filter((vendor) => vendor.is_verified == 0));
-        } else {
-            toast.error(result.message || "Failed to fetch vendors");
-        }
-    } catch (error) {
-        toast.error("Error fetching vendors");
-    } finally {
-        setLoading(false);
-    }
-};
-
-
-const fetchApprovedVendors = async () => {
-  setLoading(true);
-  try {
       const response = await fetch("https://ryupunch.com/leafly/api/Admin/list_vendors", {
-          method: "POST",
-          headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${user.token}`,
-          },
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
       });
 
       const result = await response.json();
 
       if (result.status) {
-          setVendors(result.data);
-          setApprovedVendors(result.data.filter((vendor) => vendor.is_verified == 1));
-          setPendingVendors(result.data.filter((vendor) => vendor.is_verified == 0));
+        setVendors(result.data);
+        setApprovedVendors(result.data.filter((vendor) => vendor.is_verified == 1));
+        setPendingVendors(result.data.filter((vendor) => vendor.is_verified == 0));
       } else {
-          toast.error(result.message || "Failed to fetch vendors");
+        toast.error(result.message || "Failed to fetch vendors");
       }
-  } catch (error) {
+    } catch (error) {
       toast.error("Error fetching vendors");
-  } finally {
+    } finally {
       setLoading(false);
-  }
-};
+    }
+  };
+
+
+  const fetchApprovedVendors = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("https://ryupunch.com/leafly/api/Admin/list_vendors", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+
+      const result = await response.json();
+
+      if (result.status) {
+        setVendors(result.data);
+        setApprovedVendors(result.data.filter((vendor) => vendor.is_verified == 1));
+        setPendingVendors(result.data.filter((vendor) => vendor.is_verified == 0));
+      } else {
+        toast.error(result.message || "Failed to fetch vendors");
+      }
+    } catch (error) {
+      toast.error("Error fetching vendors");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
 
@@ -127,7 +128,7 @@ const fetchApprovedVendors = async () => {
 
   const toggleStatus = async (id, currentStatus) => {
     const newStatus = currentStatus == 1 ? 0 : 1;
-    console.log("iddddd"+ id)
+    console.log("iddddd" + id)
 
     try {
       const response = await axios.post(
@@ -181,7 +182,7 @@ const fetchApprovedVendors = async () => {
       setExcelData(jsonData);
       console.log(jsonData);
     };
-};
+  };
 
 
   const handleView = (id) => {
@@ -246,8 +247,20 @@ const fetchApprovedVendors = async () => {
         return `<img src='${imageUrl}' class='w-12 h-12 rounded-lg' onerror="this.onerror=null;this.src='https://placehold.co/50x50?text=No+Image';"/>`;
       },
     },
-    { title: "Name", data: "company_name", render: (data) => (data && data.trim() !== "" ? data : "N/A") },
+    {
+      title: "Name",
+      data: "company_name",
+      render: (data, type, row) => {
+        const name = data && data.trim() !== "" ? data : "N/A";
+        const icon = row.topseller == 1
+          ? `<img src="${topsellericon}" alt="Top Seller" style="width: 20px; height: 20px;" />`
+          : "";
+
+        return `<div class="flex items-center space-x-2">${name} ${icon}</div>`;
+      }
+    },
     { title: "Email", data: "email_id" },
+    { title: "Password", data: "decrypt_password" },
     { title: "Phone", data: "phone" },
     {
       title: "Status",
@@ -273,14 +286,14 @@ const fetchApprovedVendors = async () => {
     },
   ];
 
-  const handleActiveBtnClick = () =>{
+  const handleActiveBtnClick = () => {
     setActiveTab("Approved");
     fetchApprovedVendors();
   }
-const pendingTabBtnClick = () => {
-  setActiveTab("Pending");
-  fetchVendors();
-}
+  const pendingTabBtnClick = () => {
+    setActiveTab("Pending");
+    fetchVendors();
+  }
 
 
   return (
@@ -288,40 +301,40 @@ const pendingTabBtnClick = () => {
       <div className="flex justify-between items-center mb-6 bg-white rounded px-2 py-2">
         <h1 className="text-2xl font-semibold">Vendors</h1>
         <div>
-      <input
-        type="file"
-        accept=".xlsx, .xls"
-        onChange={handleFileUpload}
-        style={{ display: "none" }}
-        id="fileInput"
-      />
-      <button
-      className="rounded border border-green-600 text-green-600 hover:bg-green-600 hover:text-white px-3 py-1"
-      onClick={() => document.getElementById("fileInput").click()}>
-        + Import
-      </button>
+          <input
+            type="file"
+            accept=".xlsx, .xls"
+            onChange={handleFileUpload}
+            style={{ display: "none" }}
+            id="fileInput"
+          />
+          <button
+            className="rounded border border-green-600 text-green-600 hover:bg-green-600 hover:text-white px-3 py-1"
+            onClick={() => document.getElementById("fileInput").click()}>
+            + Import
+          </button>
 
-    
-    </div>
+
+        </div>
       </div>
 
       <div className="flex mb-4">
-      <button
-            
-            onClick={handleActiveBtnClick}
-            className={`px-3 py-1 rounded-lg ${activeTab === "Approved" ? "bg-green-800 text-white" : "bg-gray-300 text-gray-800"
-              } mx-1`}
-          >
-            Approved
-          </button>
-          <button
-            
-            onClick={pendingTabBtnClick}
-            className={`px-3 py-1 rounded-lg ${activeTab === "Pending" ? "bg-green-800 text-white" : "bg-gray-300 text-gray-800"
-              } mx-1`}
-          >
-            Pending
-          </button>
+        <button
+
+          onClick={handleActiveBtnClick}
+          className={`px-3 py-1 rounded-lg ${activeTab === "Approved" ? "bg-green-800 text-white" : "bg-gray-300 text-gray-800"
+            } mx-1`}
+        >
+          Approved
+        </button>
+        <button
+
+          onClick={pendingTabBtnClick}
+          className={`px-3 py-1 rounded-lg ${activeTab === "Pending" ? "bg-green-800 text-white" : "bg-gray-300 text-gray-800"
+            } mx-1`}
+        >
+          Pending
+        </button>
         <button onClick={fetchVendors} className={` bg-gray-200 text-gray-700 px-2 py-1 rounded-xl`} >
           <RefreshCcw size={20} className={loading ? 'animate-spin' : ''} />
         </button>
@@ -343,7 +356,7 @@ const pendingTabBtnClick = () => {
             ))}
           </div>
         ) : (
-           activeTab == "Pending" ? (<DataTable
+          activeTab == "Pending" ? (<DataTable
             data={pendingVendors}
             columns={pendingColumns}
             options={{
@@ -364,7 +377,7 @@ const pendingTabBtnClick = () => {
                 pageLength: 10,
                 ordering: true,
                 createdRow: (row, data) => {
-                 $(row).find(".status-btn").on("click", () => toggleStatus(data.id, data.status));
+                  $(row).find(".status-btn").on("click", () => toggleStatus(data.id, data.status));
                   $(row).find(".view-btn").on("click", () => handleView(data.id));
                   $(row).find(".delete-btn").on("click", () => handleDelete(data.id));
                 },
@@ -378,16 +391,16 @@ const pendingTabBtnClick = () => {
         {addFormOpen && <AddProduct onClose={() => setAddFormOpen(false)} finalfunction={fetchVendors} />}
 
         {detailsTabOpen && (
-          <StoreProfileForUser storeId={selectedId} onClose={() => { setDetailsTabOpen(false) }} />
+          <StoreProfileForUser storeId={selectedId} onClose={() => { setDetailsTabOpen(false) }} isAdmin="yes" />
         )}
         {editTabOpen && (
           <EditStrain strainId={selectedId} onClose={() => { setEditTabOpen(false) }} finalfunction={fetchVendors} />
         )}
         {verifyTabOpen && (
-          <ViewVerify vendorId={selectedId} onClose={() => { setVerifyTabOpen(false) }} finalFunction={fetchVendors}  />
+          <ViewVerify vendorId={selectedId} onClose={() => { setVerifyTabOpen(false) }} finalFunction={fetchVendors} />
         )}
         {excelData && excelData.length > 0 && (
-          <ImportVendors excelData={excelData} onClose={()=>{setExcelData([])}} after={fetchVendors}/>
+          <ImportVendors excelData={excelData} onClose={() => { setExcelData([]) }} after={fetchVendors} />
         )}
       </AnimatePresence>
     </div>

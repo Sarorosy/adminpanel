@@ -1,39 +1,81 @@
 import { useState, useEffect } from "react";
-import { CheckCircle, MapPin, Edit, BadgeCheck, X } from "lucide-react";
+import { CheckCircle, MapPin, Edit, BadgeCheck, X, Award, Loader } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
 import EditProfile from "./EditProfile";
 import { useAuth } from "../context/AuthContext";
 import { motion } from "framer-motion";
+import toast from "react-hot-toast";
+import topsellericon from '../assets/topseller.svg';
 
-const StoreProfileForUser = ({ storeId, onClose }) => {
+const StoreProfileForUser = ({ storeId, onClose, isAdmin }) => {
     const { user } = useAuth();
     const [storeDetails, setStoreDetails] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [fetching, setFetching] = useState(false)
 
-    useEffect(() => {
-        const fetchStoreDetails = async () => {
-            try {
-                const response = await fetch('https://ryupunch.com/leafly/api/Admin/get_vendor_profile_details', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${user.token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ storeId })
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Failed to fetch store details');
-                }
-                
-                const data = await response.json();
-                setStoreDetails(data.data);
-            } catch (error) {
-                console.error('Error fetching store details:', error);
+    const fetchStoreDetails = async () => {
+        try {
+            setFetching(true);
+            const response = await fetch('https://ryupunch.com/leafly/api/Admin/get_vendor_profile_details', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ storeId })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to fetch store details');
             }
-        };
+            
+            const data = await response.json();
+            setStoreDetails(data.data);
+        } catch (error) {
+            console.error('Error fetching store details:', error);
+        }finally{
+            setFetching(false)
+        }
+    };
+    useEffect(() => {
+       
 
         fetchStoreDetails();
     }, [storeId, user.token]);
+
+    const markAsTopSeller = async (storeId, status) => {
+        if (!storeId) {
+            toast.error("Invalid Store ID!");
+            return;
+        }
+    
+        setLoading(true);
+        try {
+            const response = await fetch("https://ryupunch.com/leafly/api/Admin/markastopseller", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${user.token}`
+                },
+                body: JSON.stringify({vendor_id: storeId, status : status == 0 ? 1 : 0 })
+            });
+    
+            const data = await response.json();
+    
+            if (data.status) {
+                toast.success("Marked as Top Seller successfully!");
+                fetchStoreDetails();
+            } else {
+                toast.error(data.message || "Failed to mark as Top Seller!");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            toast.error("An error occurred while marking the store.");
+        } finally {
+            setLoading(false);
+        }
+    };
+    
 
     return (
         <motion.div
@@ -48,6 +90,8 @@ const StoreProfileForUser = ({ storeId, onClose }) => {
                 <X size={20} className="w-6 h-6 " />
             </button>
             </div>
+            {fetching ? <Loader /> : (
+            <>
             <div className="border rounded-lg pt-6 px-4 overflow-hidden shadow-lg mt-2">
                 {/* Store Banner */}
                 <div className="relative h-48 md:h-48 bg-gray-300">
@@ -85,7 +129,7 @@ const StoreProfileForUser = ({ storeId, onClose }) => {
                     {/* Store Details */}
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
                         <div className="flex items-center mb-2 md:mb-0">
-                            <h1 className="text-3xl font-bold mr-2">{storeDetails?.company_name}</h1>
+                            <h1 className="text-3xl font-bold mr-2 flex items-center">{storeDetails?.company_name}{storeDetails?.topseller == 1 &&  <img src={topsellericon} className="w-16 h-auto" />}</h1>
                             {storeDetails?.status == 1 && <BadgeCheck className="w-6 h-6 text-green-800 rounded-full bg-green-100" />}
                         </div>
                     </div>
@@ -98,8 +142,22 @@ const StoreProfileForUser = ({ storeId, onClose }) => {
 
                     {/* Store Description */}
                     <p className="text-gray-600">{storeDetails?.description}</p>
+                    
                 </div>
             </div>
+            {storeDetails && storeDetails.topseller && isAdmin && isAdmin == "yes" && (
+                <div className="flex justify-center mt-4 mb-4">
+                <button 
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
+                    onClick={() => markAsTopSeller(storeId, storeDetails.topseller)}
+                >
+                    {storeDetails.topseller == 1 ? 'Remove' : "Mark"} as Top Seller
+                </button>
+            </div>
+            
+            )}
+            </>
+            )}
         </motion.div>
     );
 };
