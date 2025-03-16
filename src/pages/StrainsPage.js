@@ -180,6 +180,30 @@ const StrainsPage = () => {
         }
     };
 
+    const toggleTopSeller = async (id, status) => {
+        try {
+            const response = await fetch("https://ryupunch.com/leafly/api/Admin/markstrainastopseller", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${user.token}`
+                },
+                body: JSON.stringify({ id, status })
+            });
+    
+            const data = await response.json();
+            if (data.status) {
+                toast.success("Status updated successfully!");
+            } else {
+                toast.error("Failed to update status.");
+            }
+        } catch (error) {
+            console.error("Error updating Top Seller status:", error);
+            toast.error("An error occurred.");
+        }
+    };
+    
+
     const pendingColumns = [
         {
             title: "Image",
@@ -252,6 +276,19 @@ const StrainsPage = () => {
         //         return `<button class='status-btn px-3 py-1 rounded-full text-sm font-medium ${bgColor}' data-id="${row.id}">${displayText}</button>`;
         //     },
         // },
+        {
+            title: "Top Seller",
+            data: "topseller",
+            render: (data, type, row) => {
+                const checked = row.topseller == 1 ? "checked" : "";
+                return `
+                    <label class="flex items-center cursor-pointer">
+                        <input type="checkbox" class="toggle-switch" data-id="${row.id}" ${checked} />
+                        <span class="ml-2">Top Seller</span>
+                    </label>
+                `;
+            }
+        },        
         {
             title: "Actions",
             data: null,
@@ -342,6 +379,11 @@ const StrainsPage = () => {
                                 pageLength: 10,
                                 ordering: true,
                                 createdRow: (row, data) => {
+                                    $(row).find(".toggle-switch").on("change", function () {
+                                        const id = $(this).data("id");
+                                        const status = this.checked ? 1 : 0;
+                                        toggleTopSeller(id, status);
+                                    });
                                     $(row).find(".status-btn").on("click", () => toggleStatus(data.id, data.status));
                                     $(row).find(".view-btn").on("click", () => handleView(data.id, data.name));
                                     $(row).find(".delete-btn").on("click", () => handleDelete(data.id));

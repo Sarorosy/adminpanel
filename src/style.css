@@ -66,3 +66,6 @@ input[type=number] {
 .leaflet-popup-tip{
     background-color: #baffba !important;
 }
+input{
+    accent-color: #1e3a1e;
+}
