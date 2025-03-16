@@ -14,12 +14,14 @@ import axios from "axios";
 import EditStrain from "./EditStrain";
 import ViewVerify from "./ViewVerify";
 import StoreProfileForUser from "./StoreProfileForUser";
+import * as XLSX from "xlsx";
+import ImportVendors from "./ImportVendors";
 
 const VendorsPage = () => {
   const [vendors, setVendors] = useState([]);
   const [approvedVendors, setApprovedVendors] = useState([]);
   const [pendingVendors, setPendingVendors] = useState([]);
-
+  const [excelData, setExcelData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [addFormOpen, setAddFormOpen] = useState(false);
   const [detailsTabOpen, setDetailsTabOpen] = useState(false);
@@ -57,6 +59,7 @@ const VendorsPage = () => {
         setLoading(false);
     }
 };
+
 
 const fetchApprovedVendors = async () => {
   setLoading(true);
@@ -158,6 +161,27 @@ const fetchApprovedVendors = async () => {
       toast.error("Something went wrong!");
     }
   };
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.readAsBinaryString(file);
+
+    reader.onload = (e) => {
+      const binaryData = e.target.result;
+      const workbook = XLSX.read(binaryData, { type: "binary" });
+
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+
+      // Convert sheet to JSON with empty fields preserved
+      const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+
+      setExcelData(jsonData);
+      console.log(jsonData);
+    };
+};
 
 
   const handleView = (id) => {
@@ -263,6 +287,22 @@ const pendingTabBtnClick = () => {
     <div className="px-3 py-3 bg-gray-100 min-h-screen">
       <div className="flex justify-between items-center mb-6 bg-white rounded px-2 py-2">
         <h1 className="text-2xl font-semibold">Vendors</h1>
+        <div>
+      <input
+        type="file"
+        accept=".xlsx, .xls"
+        onChange={handleFileUpload}
+        style={{ display: "none" }}
+        id="fileInput"
+      />
+      <button
+      className="rounded border border-green-600 text-green-600 hover:bg-green-600 hover:text-white px-3 py-1"
+      onClick={() => document.getElementById("fileInput").click()}>
+        + Import
+      </button>
+
+    
+    </div>
       </div>
 
       <div className="flex mb-4">
@@ -345,6 +385,9 @@ const pendingTabBtnClick = () => {
         )}
         {verifyTabOpen && (
           <ViewVerify vendorId={selectedId} onClose={() => { setVerifyTabOpen(false) }} finalFunction={fetchVendors}  />
+        )}
+        {excelData && excelData.length > 0 && (
+          <ImportVendors excelData={excelData} onClose={()=>{setExcelData([])}} after={fetchVendors}/>
         )}
       </AnimatePresence>
     </div>
