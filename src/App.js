@@ -15,6 +15,7 @@ import TermsOfUse from "./pages/TermsOfUse";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import StrainsPage from "./pages/StrainsPage";
 import ManageFaq from "./pages/faq/ManageFaq";
+import ManageAds from "./pages/ads/ManageAds";
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -53,6 +54,7 @@ const App = () => {
             <Route path="terms-of-use" element={<TermsOfUse />} />
             <Route path="privacy-policy" element={<PrivacyPolicy />} />
             <Route path="faq" element={<ManageFaq />} />
+            <Route path="ads" element={<ManageAds />} />
           </Route>
 
           {/* Fallback Route */}
